@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CiteCase - Questions Of Law</title>
+  <style>
+    :root {
+      --bg: #fbfbf9;
+      --card-bg: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #666666;
+      --border: #e5e5e0;
+      --primary: #111111;
+      --primary-hover: #2e2e2e;
+      --btn-text: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.05);
+      --badge-cite-bg: #ffffff;
+      --badge-cite-color: #111111;
+      --badge-case-bg: #111111;
+      --badge-case-color: #ffffff;
+      --badge-border: #111111;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --text: #f0f0ee;
+      --text-muted: #a0a09d;
+      --border: #2d2d2d;
+      --primary: #f0f0ee;
+      --primary-hover: #e0e0dc;
+      --btn-text: #121212;
+      --shadow: rgba(0, 0, 0, 0.3);
+      --badge-cite-bg: #ffffff;
+      --badge-cite-color: #000000;
+      --badge-case-bg: #000000;
+      --badge-case-color: #ffffff;
+      --badge-border: #444444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Centered Header Layout */
+    header {
+      padding: 16px 24px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .brand-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 5px;
+    }
+
+    /* Unified, larger badge with zero gap */
+    .brand-badge {
+      display: inline-flex;
+      align-items: stretch;
+      border: 2px solid var(--badge-border);
+      border-radius: 7px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-weight: 800;
+      font-size: 1.45rem;
+      letter-spacing: -0.01em;
+      line-height: 1;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .badge-cite {
+      background-color: var(--badge-cite-bg);
+      color: var(--badge-cite-color);
+      padding: 7px 11px 7px 13px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .badge-case {
+      background-color: var(--badge-case-bg);
+      color: var(--badge-case-color);
+      padding: 7px 13px 7px 11px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .brand-tagline {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .counter-pill {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 0.82rem;
+      background: var(--border);
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 11px;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--text-muted);
+    }
+
+    /* Deck Container */
+    main {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      position: absolute;
+      width: 100%;
+      max-width: 680px;
+      height: auto;
+      max-height: 82%;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 44px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(60px);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+      touch-action: pan-y;
+      will-change: transform, opacity;
+      overflow-y: auto;
+    }
+
+    .card.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .card.slide-left {
+      opacity: 0;
+      transform: translateX(-60px);
+    }
+
+    .card.slide-right {
+      opacity: 0;
+      transform: translateX(60px);
+    }
+
+    .question-content {
+      user-select: text;
+      -webkit-user-select: text;
+      font-size: 1.35rem;
+      line-height: 1.65;
+      text-align: center;
+      font-weight: 400;
+      margin: auto 0;
+      padding: 12px 0 36px 0;
+    }
+
+    .action-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .btn-read {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      background-color: var(--primary);
+      color: var(--btn-text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 12px 28px;
+      border-radius: 6px;
+      transition: transform 0.15s ease, background-color 0.2s;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-read:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-read svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* Footer & Controls */
+    footer {
+      padding: 14px 24px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .nav-btn {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 20px;
+      border-radius: 6px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: var(--text-muted);
+      background: var(--border);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .swipe-hint {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 12px 16px;
+      }
+      .brand-badge {
+        font-size: 1.25rem;
+      }
+      .badge-cite {
+        padding: 6px 9px 6px 11px;
+      }
+      .badge-case {
+        padding: 6px 11px 6px 9px;
+      }
+      .brand-tagline {
+        font-size: 0.68rem;
+        letter-spacing: 0.11em;
+      }
+      .counter-pill {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+      }
+      .card {
+        padding: 32px 20px;
+        max-height: 88%;
+      }
+      .question-content {
+        font-size: 1.15rem;
+        line-height: 1.55;
+        padding: 8px 0 24px 0;
+      }
+      .swipe-hint {
+        display: none;
+      }
+      .btn-read {
+        width: 100%;
+        padding: 13px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <div id="counter" class="counter-pill">1 / 79</div>
+    </div>
+
+    <div class="brand-container">
+      <div class="brand-badge">
+        <span class="badge-cite">Cite</span><span class="badge-case">Case</span>
+      </div>
+      <span class="brand-tagline">Questions Of Law</span>
+    </div>
+
+    <div class="header-right">
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+        <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="cardTrack" aria-live="polite">
+    <!-- Populated by JS -->
+  </main>
+
+  <footer>
+    <button id="prevBtn" class="nav-btn" aria-label="Previous question">
+      &#8592; Prev
+    </button>
+    <div class="swipe-hint">Swipe or use &larr; &rarr; keys</div>
+    <button id="nextBtn" class="nav-btn" aria-label="Next question">
+      Next &#8594;
+    </button>
+  </footer>
+
+  <script>
+    const data = [
+      {
+        q: "Is the absence of dock identification fatal to identity-centric prosecutions where police disclosed the suspect name and sketches were withheld?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_khkiRfJ2Pvku"
+      },
+      {
+        q: "Does Section 165 Evidence Act impose an active duty on criminal courts to question witnesses or elicit unattended material evidence central to guilt/innocence?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_khkiRfJ2Pvku"
+      },
+      {
+        q: "Does Section 311 CrPC empower courts to summon/examine witnesses to resolve material evidentiary gaps bearing directly on adjudication?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_khkiRfJ2Pvku"
+      },
+      {
+        q: "Should cumulative infirmities in identity, timing, and medical evidence result in acquittal when reasonable doubt is established?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_khkiRfJ2Pvku"
+      },
+      {
+        q: "Should a matter be declined remand for de novo trial where fatal evidentiary identification defects cannot be cured and accused underwent long custody?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_khkiRfJ2Pvku"
+      },
+      {
+        q: "Does Section 47-A Indian Stamp Act 1899 require proof of fraudulent intention or wilful undervaluation as an express jurisdictional condition, or is a referral to Larger Bench required?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_fcYAm5eKYkc7"
+      },
+      {
+        q: "Through what narrow exceptions (want/abuse of jurisdiction) may a writ court entertain a challenge to a show cause notice under Article 226?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_fcYAm5eKYkc7"
+      },
+      {
+        q: "Must taxing statutes be construed strictly according to natural meaning without judicial addition of unexpressed equitable ingredients like fraudulent intent?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_fcYAm5eKYkc7"
+      },
+      {
+        q: "Are revenue circle/guideline values merely prima facie assessment aids rather than conclusive market value evidence under Section 47-A(6)?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_fcYAm5eKYkc7"
+      },
+      {
+        q: "Should related optical fiber cable contract disputes under T-Fiber Agreement be assigned to the same arbitrator first appointed in the Mahanet arbitration?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_TyBUNt8TSPiN"
+      },
+      {
+        q: "Does a subsequent failure to marry or breakdown of a digital-platform consensual relationship due to familial disapproval constitute initial fraudulent deception under Section 69 BNS?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_FpocLqYWAtiN"
+      },
+      {
+        q: "Is enhancement of judicial officer superannuation age to 62 years necessary and valid subject to High Court suitability assessment upon attaining age 60?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_e3M6yFinfB4V"
+      },
+      {
+        q: "Do judicial officers constitute a distinct specialized cadre controlled by High Courts under Articles 233/235 immune to general state employee superannuation parity claims?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_e3M6yFinfB4V"
+      },
+      {
+        q: "Does the Advocates Act 1961 confer penal or disciplinary jurisdiction upon BCI/State Bar Councils over law students prior to graduation and advocate enrollment?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_kP9V7pZqUjgr"
+      },
+      {
+        q: "Does administrative withdrawal of an impugned communication prevent constitutional court adjudication of live jurisdictional challenges and making protective relief absolute?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_kP9V7pZqUjgr"
+      },
+      {
+        q: "Does general matrimonial discord or harassment without specific abetment intent under Section 107 IPC constitute abetment of suicide under Section 306 IPC?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_cAXcTvytc8kA"
+      },
+      {
+        q: "When may an appellate court reverse an acquittal, and does reversal require a explicit finding that the trial view was perverse or unsupported?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_cAXcTvytc8kA"
+      },
+      {
+        q: "May the Supreme Court exercise Article 142 plenary power to protect retiral/pensionary benefits of long-serving employees holding invalidated caste certificates based on equitable considerations?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_CnorkXPTagtX"
+      },
+      {
+        q: "What high probative value do pre-constitutional paternal ancestry records hold in disproving Scheduled Tribe status claims before scrutiny committees?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_CnorkXPTagtX"
+      },
+      {
+        q: "Must motor accident claim multipliers be determined strictly using the age of the deceased per the standardised matrix nationwide?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_e2ShvcQrhn6R"
+      },
+      {
+        q: "Must functional disability compensation reflect open-market earning capacity loss from permanent physical impairment rather than accommodation in sheltered roles?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_e2ShvcQrhn6R"
+      },
+      {
+        q: "Do summary MACT proceedings require negligence proof on a preponderance of probabilities rather than criminal proof beyond reasonable doubt?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_e2ShvcQrhn6R"
+      },
+      {
+        q: "Does Section 106 Evidence Act shift the burden to explain a body's presence on premises without prosecution first proving exclusive possession or tenancy?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_9yVs7UigcG8y"
+      },
+      {
+        q: "Is electronic evidence including CCTV footage and call records inadmissible without mandatory Section 65B Evidence Act certification?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_9yVs7UigcG8y"
+      },
+      {
+        q: "Are test identification parades unreliable where witnesses viewed suspect photographs prior to identification procedures?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_9yVs7UigcG8y"
+      },
+      {
+        q: "Can penal lease time extension charges arising from Corporate Debtor default be categorized as CIRP costs mulcted onto homebuyers or SRA?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_5CKN6cSXFDxU"
+      },
+      {
+        q: "Must welfare urban development authorities waive profit-motivated penalty charges delaying residential project completion for homebuyers?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_5CKN6cSXFDxU"
+      },
+      {
+        q: "Does a statutory educator regulator possess inherent/incidental power under NCTE Act Section 12(k) to enforce accountability via Performance Appraisal Reports?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_FsM9it6wRMR9"
+      },
+      {
+        q: "Do administrative law principles of accountability require regulated institutions to be responsible, answerable, and enforceable to statutory regulators?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_FsM9it6wRMR9"
+      },
+      {
+        q: "When will the Supreme Court decline Article 136 interference with non-perverse High Court interim orders directing third-party regulatory participation?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_vKzj5RP6pjiM"
+      },
+      {
+        q: "Is the Electricity Act 2003 a complete self-contained code leaving no unallocated regulatory residue outside commission jurisdiction?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_vKzj5RP6pjiM"
+      },
+      {
+        q: "Does Section 94(3) Electricity Act empower appropriate commissions to authorize consumer representation in regulatory proceedings?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_vKzj5RP6pjiM"
+      },
+      {
+        q: "Is the third proviso to Article 243ZL(1) an independent incorporation of the Banking Regulation Act 1949 exempting multi-State co-operative bank board supersessions from the six-month cap?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_zgGqtTcFaXGw"
+      },
+      {
+        q: "Can RBI board supersession extensions under Section 36AAA(1) Banking Regulation Act aggregate up to five years independently of elected board terms?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_zgGqtTcFaXGw"
+      },
+      {
+        q: "Does the mandatory State Government consultation proviso under Section 36AAA(1) Banking Regulation Act apply to multi-State co-operative banks?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_zgGqtTcFaXGw"
+      },
+      {
+        q: "What interpretive rules govern provisos functioning as exceptions, mandatory conditions, substantive enactments, or optional addenda?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_zgGqtTcFaXGw"
+      },
+      {
+        q: "How does the doctrine of incorporation operate when incorporated statutory provisions operate with independent force?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_zgGqtTcFaXGw"
+      },
+      {
+        q: "Can Article 142 plenary powers dissolve long-separated unworkable marriages by mutual consent and quash all ancillary criminal/civil proceedings?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_dVartXxwnHDf"
+      },
+      {
+        q: "Under Advocates Act Section 4, are High Court Chief Justices mandated to nominate women members to satisfy 30% State Bar Council representation quotas?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_sXdnWs4M9Ajc"
+      },
+      {
+        q: "Must State Bar Councils promptly elect office-bearers and BCI representatives upon notification of full council composition?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_sXdnWs4M9Ajc"
+      },
+      {
+        q: "What specific compliance timelines and AG/SG association apply to co-opting women members and electing BCI representatives across State Bar Councils?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_6WHk2Kz86VGa"
+      },
+      {
+        q: "Do cooperative federalism principles require Union-State regulatory harmony to facilitate Article 19(1)(g) trade rights without bureaucratic inaction bans?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_q3f6DRhrKnSC"
+      },
+      {
+        q: "Can state governments regulate territorial waters fishing for juvenile fish conservation under the Tamil Nadu Marine Fishing Regulation Act 1983?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_q3f6DRhrKnSC"
+      },
+      {
+        q: "Does the Union exercise exclusive EEZ fishing regulatory authority under the 1976 Maritime Zones Act and EEZ Rules 2025?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_q3f6DRhrKnSC"
+      },
+      {
+        q: "Does intentional permanent forsaking without consent/cause establish desertion under Hindu Marriage Act Section 13(1)(ib) and irretrievable breakdown?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_tJVpAjK7xCzM"
+      },
+      {
+        q: "Does long separation rendering a matrimonial bond beyond salvage warrant dissolution to prevent misery?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_tJVpAjK7xCzM"
+      },
+      {
+        q: "Does Gujarat Prohibition Act Section 98(2) absolute embargo override judicial power under Section 451 CrPC for interim vehicle custody to prevent deterioration?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_u5dqaJDQYtML"
+      },
+      {
+        q: "How must courts balance owner interest, evidence preservation, and property deterioration prevention during Section 451 CrPC interim custody applications?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_u5dqaJDQYtML"
+      },
+      {
+        q: "Does a stock exchange lack statutory byelaw power under SCRA Section 9(3)(b) to impose monetary penalties or order disgorgement/restitution of liquidated securities?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_mBpbCmSYxKNt"
+      },
+      {
+        q: "Did professional clearing members lack statutory or regulatory duty prior to 2021 daily reporting requirements to verify individual client debit/credit positions?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_mBpbCmSYxKNt"
+      },
+      {
+        q: "Are voluntary participants in illegal fixed-return F&O schemes precluded from claiming loss compensation from clearing members upon trading member default?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_mBpbCmSYxKNt"
+      },
+      {
+        q: "Does Section 362 CrPC finality bar prevent High Courts from exercising Section 482 inherent power to recall judgments passed without jurisdiction regarding proved juvenility?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_LfgEfUUamp4h"
+      },
+      {
+        q: "Can an offence date determine juvenility claims raised post-disposal, divesting regular criminal courts of sentencing jurisdiction?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_LfgEfUUamp4h"
+      },
+      {
+        q: "Does secondary evidence/disappearance conviction under Section 201 IPC fall if underlying charges like murder remain unproved and accused is juvenile?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_LfgEfUUamp4h"
+      },
+      {
+        q: "Does a successor bank acquire secured creditor status under SARFAESI Act upon acquiring live loan debt originally granted by non-covered entities?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_coCBX2ePQk9A"
+      },
+      {
+        q: "Does the statutory purpose of SARFAESI Act justify non-performing asset recovery across all live loan accounts regardless of initial lender classification?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_coCBX2ePQk9A"
+      },
+      {
+        q: "Must revisional power under Section 56 Karnataka Land Revenue Act 1964 be exercised within the mandatory 3-year limitation period under proviso 56(3)?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_hNdnAaAHt5te"
+      },
+      {
+        q: "Can revenue court inherent powers under Section 25 Karnataka Land Revenue Act bypass express limitation periods for revisional jurisdiction or apply to administrative actions?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_hNdnAaAHt5te"
+      },
+      {
+        q: "Must power unconstrained by specific limitation still be exercised within reasonable time precluding stale reopenings harming third-party rights?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_hNdnAaAHt5te"
+      },
+      {
+        q: "Does unsupported last-seen-together theory and major contradiction require extension of benefit of doubt in circumstantial murder cases?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_XdjSWD7dWw7j"
+      },
+      {
+        q: "Is police custody disclosure admissible under Section 27 Evidence Act only when leading to discovery of distinct facts unknown to police?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_XdjSWD7dWw7j"
+      },
+      {
+        q: "Can weak extra-judicial confessions without independent cogent corroboration form the sole basis for criminal conviction?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_XdjSWD7dWw7j"
+      },
+      {
+        q: "Does adjudicatory reliance on AI-generated fake/hallucinated precedents violate adjudicatory process sanctity requiring order setting aside and remand?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_hwgQt24Nne2w"
+      },
+      {
+        q: "Does customs penalty imposition relying on fabricated case law require fresh adjudication by a different officer?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_hwgQt24Nne2w"
+      },
+      {
+        q: "Can Article 142 complete justice powers quash July 2026 student demonstration FIRs and mandate suicide compensation policies while preserving serious antecedent criminal FIRs?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_cGf3XJG9v9iv"
+      },
+      {
+        q: "Does acquittal on a graver charge (Section 302 IPC) automatically acquit lesser alternative charges without independent appellate evidentiary evaluation under Section 221/386 CrPC?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_wGu62qtTd2X8"
+      },
+      {
+        q: "Is appellate court under statutory obligation under Section 386 CrPC to re-examine evidence for potential lesser charge conviction upon reversing conviction?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_wGu62qtTd2X8"
+      },
+      {
+        q: "Is prolonged pre-trial detention a paramount consideration for bail alongside parity and Section 161 statements?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_KDZxh77kAd8r"
+      },
+      {
+        q: "Do police statements under Section 161 CrPC require weighing alongside detention length and trial progress for bail?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_KDZxh77kAd8r"
+      },
+      {
+        q: "Does an in-court statement qualify as a binding contempt undertaking only if conveying firm intent to be bound, excluding mere clarificatory statements?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_nU9NzV4ad5aj"
+      },
+      {
+        q: "Must courts enforcing reciprocating territory foreign decrees respect comity of nations and impose security conditions preventing asset camouflage/dissipation?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_nU9NzV4ad5aj"
+      },
+      {
+        q: "Does \"fails to pay\" under Section 38(3) Finance Act 1979 mean non-payment rather than delayed payment governed by Section 38(4)?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_vU84fjdiuwJV"
+      },
+      {
+        q: "Is statutory breach penalty automatic upon timeline failure, or must authorities exercise judicial discretion declining penalty for technical/venial non-contumacious delays?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_vU84fjdiuwJV"
+      },
+      {
+        q: "Does the no reformatio in peius principle bar authorities from enhancing penalties on remand penalizing appellants for challenging initial orders?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_vU84fjdiuwJV"
+      },
+      {
+        q: "Is the word 'shall' in fiscal statutes automatically mandatory, or contextualized against overall scheme discretion?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_vU84fjdiuwJV"
+      },
+      {
+        q: "What comprehensive rehabilitation schemes and retail acid sale regulations must states/UTs and Union formulate for acid attack victims?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_8rAgVWgvnyGZ"
+      },
+      {
+        q: "Can a writ petition under Article 32 be employed to seek reconsideration of a binding Supreme Court judgment?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_ToJNZBZSspra"
+      },
+      {
+        q: "Does Family Court Judge office constitute judicial office for High Court appointment eligibility under Article 217(2)(a)?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_ToJNZBZSspra"
+      },
+      {
+        q: "Can Section 482 CrPC power justify issuing omnibus investigation guidelines where summoning orders are quashed and closure reports validated?",
+        url: "https://caseciter.in/sci-judgments/documents/ent_q7Y5WYuU4MsD"
+      }
+    ];
+
+    let currentIndex = 0;
+    const total = data.length;
+    const cardTrack = document.getElementById('cardTrack');
+    const counter = document.getElementById('counter');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const themeToggle = document.getElementById('themeToggle');
+
+    data.forEach((item, idx) => {
+      const card = document.createElement('article');
+      card.className = `card ${idx === 0 ? 'active' : 'slide-right'}`;
+      card.id = `card-${idx}`;
+      card.innerHTML = `
+        <div class="question-content">${item.q}</div>
+        <div class="action-container">
+          <a class="btn-read" href="${item.url}" target="_blank" rel="noopener noreferrer">
+            <span>Read SC Judgment</span>
+            <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </a>
+        </div>
+      `;
+      cardTrack.appendChild(card);
+    });
+
+    function updateView(newIndex, direction = 0) {
+      if (newIndex < 0 || newIndex >= total || newIndex === currentIndex) return;
+
+      const currentCard = document.getElementById(`card-${currentIndex}`);
+      const nextCard = document.getElementById(`card-${newIndex}`);
+
+      if (direction > 0) {
+        currentCard.className = 'card slide-left';
+        nextCard.className = 'card active';
+      } else if (direction < 0) {
+        currentCard.className = 'card slide-right';
+        nextCard.className = 'card active';
+      } else {
+        currentCard.className = 'card slide-left';
+        nextCard.className = 'card active';
+      }
+
+      currentIndex = newIndex;
+      counter.textContent = `${currentIndex + 1} / ${total}`;
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === total - 1;
+    }
+
+    prevBtn.addEventListener('click', () => updateView(currentIndex - 1, -1));
+    nextBtn.addEventListener('click', () => updateView(currentIndex + 1, 1));
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        updateView(currentIndex + 1, 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        updateView(currentIndex - 1, -1);
+      }
+    });
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    cardTrack.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    cardTrack.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+      const minSwipeDistance = 45;
+
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+        if (deltaX < 0) {
+          updateView(currentIndex + 1, 1);
+        } else {
+          updateView(currentIndex - 1, -1);
+        }
+      }
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.body.removeAttribute('data-theme');
+        themeToggle.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+      } else {
+        document.body.setAttribute('data-theme', 'dark');
+        themeToggle.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+      }
+    });
+
+    prevBtn.disabled = true;
+  </script>
+</body>
+</html>
